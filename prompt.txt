@@ -1,0 +1,2 @@
+Look into the puzzle and input file and generate the solution in python. Have it clean and simple and documented.
+Generate unit-test for each function
