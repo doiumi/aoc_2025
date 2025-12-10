@@ -43,16 +43,8 @@ def _handle_response(response: requests.Response, day: int) -> str:
     if response.status_code != 200:
         raise FetchError(f"Unexpected status {response.status_code} from AoC.")
 
-    text = response.text
-    locked_markers = [
-        "Please don't repeatedly request this",
-        "unlock",
-        "you'll need to wait",
-        "not available yet",
-    ]
-    if any(marker.lower() in text.lower() for marker in locked_markers):
-        raise LockedDayError(f"Day {day} appears to be locked.")
-    return text
+    # Do not rely on heuristic text checks; available pages mention "unlock" for part 2.
+    return response.text
 
 
 def fetch_puzzle(day: int, config: AgentConfig, *, base_dir: Optional[Path] = None, force: bool = False) -> FetchResult:

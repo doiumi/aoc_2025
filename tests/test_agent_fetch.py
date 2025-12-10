@@ -54,7 +54,7 @@ def test_fetch_input_network_writes_cache(tmp_path: Path, config, monkeypatch):
 
 def test_locked_day_detected(tmp_path: Path, config, monkeypatch):
     def locked_get(url, config):
-        return DummyResponse("please wait until it unlocks", status_code=200)
+        return DummyResponse("not found", status_code=404)
 
     monkeypatch.setattr(fetch, "_aoc_get", locked_get)
 
