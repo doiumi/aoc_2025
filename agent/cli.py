@@ -8,8 +8,6 @@ import argparse
 import sys
 
 from agent.config import ConfigError, load_config, validate_day, validate_part
-from agent.errors import FetchError, LockedDayError
-from agent.fetch import fetch_input, fetch_puzzle
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -55,25 +53,7 @@ def main(argv: list[str] | None = None) -> int:
 
     match args.command:
         case "fetch":
-            try:
-                puzzle = fetch_puzzle(day, config)
-                puzzle_msg = f"puzzle ({puzzle.source}) -> {puzzle.path}"
-            except LockedDayError as exc:
-                parser.error(str(exc))
-                return 2
-            except FetchError as exc:
-                parser.error(f"Failed to fetch puzzle: {exc}")
-                return 2
-
-            try:
-                input_res = fetch_input(day, config)
-                input_msg = f"input ({input_res.source}) -> {input_res.path}"
-            except FetchError as exc:
-                parser.error(f"Failed to fetch input: {exc}")
-                return 2
-
-            print(f"[agent] Fetched {puzzle_msg}")
-            print(f"[agent] Fetched {input_msg}")
+            print(f"[agent] Fetch stub: day {day} (year {config.year})")
             return 0
         case "solve":
             print(f"[agent] Solve stub: day {day} part {part} input={args.input or 'default'}")
