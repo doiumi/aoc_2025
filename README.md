@@ -22,14 +22,6 @@ python -m aoc_2025 --day 2 --part 1 --input inputs/day_02.txt
 ```
 `--input` is optional; by default it uses `inputs/day_XX.txt`.
 
-Quick examples using the bundled inputs:
-```
-python -m aoc_2025 --day 1 --part 1    # => 1100
-python -m aoc_2025 --day 1 --part 2    # => 6358
-python -m aoc_2025 --day 2 --part 1    # => 31210613313
-python -m aoc_2025 --day 2 --part 2    # => 41823587546
-```
-
 ## Tests
 ```
 pytest
