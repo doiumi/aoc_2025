@@ -45,6 +45,7 @@ python -m agent solve --day 2 --part 2
 # Submit (rate limited; requires --confirm; computes answer if omitted)
 python -m agent submit --day 2 --part 1 --confirm
 ```
+Alternatively, put your session cookie in a file named `.aoc_session` at the repo root (one line with the cookie value); it is git-ignored.
 
 ## Tests
 ```

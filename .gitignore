@@ -201,6 +201,8 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# AoC session cookie file (not to be committed)
+.aoc_session
 # Marimo
 marimo/_static/
 marimo/_lsp/
