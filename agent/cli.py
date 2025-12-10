@@ -10,8 +10,6 @@ import sys
 from agent.config import ConfigError, load_config, validate_day, validate_part
 from agent.errors import FetchError, LockedDayError
 from agent.fetch import fetch_input, fetch_puzzle
-from agent.runner import run_solver
-from agent.submit import RateLimitError, SubmitError, submit_answer
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -39,7 +37,6 @@ def build_parser() -> argparse.ArgumentParser:
     submit_parser.add_argument("--part", type=int, choices=[1, 2], required=True, help="Puzzle part (1 or 2)")
     submit_parser.add_argument("--answer", type=str, default=None, help="Answer to submit (default: compute via solver)")
     submit_parser.add_argument("--confirm", action="store_true", help="Required flag to actually submit")
-    submit_parser.add_argument("--input", type=str, default=None, help="Path to input file (defaults to inputs/day_XX.txt)")
 
     return parser
 
@@ -79,18 +76,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[agent] Fetched {input_msg}")
             return 0
         case "solve":
-            try:
-                result = run_solver(day, part, input_path=args.input)
-            except ConfigError as exc:
-                parser.error(str(exc))
-                return 2
-
-            if part == 1:
-                print(f"[agent] Day {day} Part 1 answer: {result}")
-            else:
-                part1, part2 = result
-                print(f"[agent] Day {day} Part 1 answer: {part1}")
-                print(f"[agent] Day {day} Part 2 answer: {part2}")
+            print(f"[agent] Solve stub: day {day} part {part} input={args.input or 'default'}")
             return 0
         case "validate":
             print(f"[agent] Validate stub: day {day} part {part}")
@@ -99,27 +85,7 @@ def main(argv: list[str] | None = None) -> int:
             if not args.confirm:
                 print("[agent] Submission requires --confirm flag. Aborting.")
                 return 1
-
-            answer = args.answer
-            if answer is None:
-                try:
-                    result = run_solver(day, part, input_path=args.input)
-                except ConfigError as exc:
-                    parser.error(str(exc))
-                    return 2
-                answer = str(result if part == 1 else result[1])
-
-            try:
-                submit_res = submit_answer(day, part, answer, config)
-            except RateLimitError as exc:
-                parser.error(str(exc))
-                return 2
-            except SubmitError as exc:
-                parser.error(str(exc))
-                return 2
-
-            print(f"[agent] Submit status: {submit_res.status}")
-            print(f"[agent] Response saved to: {submit_res.path}")
+            print(f"[agent] Submit stub: day {day} part {part} answer={args.answer or '<computed>'}")
             return 0
         case _:
             parser.error("Unknown command")
