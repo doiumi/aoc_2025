@@ -11,7 +11,7 @@ from agent.config import ConfigError, load_config, validate_day, validate_part
 from agent.errors import FetchError, LockedDayError
 from agent.fetch import fetch_input, fetch_puzzle
 from agent.scaffold import scaffold_day
-from agent.runner import run_solver
+from agent.runner import run_solver, write_outputs
 from agent.submit import RateLimitError, SubmitError, submit_answer
 
 
@@ -45,6 +45,14 @@ def build_parser() -> argparse.ArgumentParser:
     # scaffold
     scaffold_parser = subparsers.add_parser("scaffold", help="Create solution/test stubs for a day")
     scaffold_parser.add_argument("--day", type=int, required=True, help="Day number (1-25)")
+
+    # run (fetch -> solve -> save outputs, optional submit/validate)
+    run_parser = subparsers.add_parser("run", help="Fetch, solve both parts, save outputs, optional submit")
+    run_parser.add_argument("--day", type=int, required=True, help="Day number (1-25)")
+    run_parser.add_argument("--input", type=str, default=None, help="Path to input file (defaults to inputs/day_XX.txt)")
+    run_parser.add_argument("--submit", action="store_true", help="Submit answers after solving")
+    run_parser.add_argument("--confirm", action="store_true", help="Required to submit")
+    run_parser.add_argument("--validate-tests", action="store_true", help="Run pytest -k day_XX after solving")
 
     return parser
 
@@ -130,6 +138,65 @@ def main(argv: list[str] | None = None) -> int:
             sol_path, test_path = scaffold_day(day)
             print(f"[agent] Scaffolded solution: {sol_path}")
             print(f"[agent] Scaffolded test: {test_path}")
+            return 0
+        case "run":
+            # Fetch
+            try:
+                puzzle = fetch_puzzle(day, config)
+                input_res = fetch_input(day, config)
+            except LockedDayError as exc:
+                parser.error(str(exc))
+                return 2
+            except FetchError as exc:
+                parser.error(f"Fetch failed: {exc}")
+                return 2
+
+            print(f"[agent] Puzzle: {puzzle.source} -> {puzzle.path}")
+            print(f"[agent] Input: {input_res.source} -> {input_res.path}")
+
+            # Solve both parts
+            try:
+                part1, part2 = run_solver(day, 2, input_path=args.input or input_res.path)
+            except ConfigError as exc:
+                parser.error(str(exc))
+                return 2
+
+            print(f"[agent] Day {day} Part 1 answer: {part1}")
+            print(f"[agent] Day {day} Part 2 answer: {part2}")
+
+            # Write outputs
+            p1_path, p2_path = write_outputs(day, part1, part2)
+            print(f"[agent] Saved Part 1 -> {p1_path}")
+            print(f"[agent] Saved Part 2 -> {p2_path}")
+
+            # Optional validation via pytest for that day
+            if args.validate_tests:
+                import subprocess
+
+                pattern = f"day_{day:02d}"
+                print(f"[agent] Running pytest -k {pattern} ...")
+                proc = subprocess.run(["pytest", "-k", pattern], check=False)
+                if proc.returncode != 0:
+                    parser.error("Validation tests failed; aborting submit.")
+                    return proc.returncode
+
+            # Optional submit
+            if args.submit:
+                if not args.confirm:
+                    parser.error("Submission requested but --confirm not provided.")
+                    return 2
+                try:
+                    res1 = submit_answer(day, 1, str(part1), config)
+                    print(f"[agent] Submit Part 1 status: {res1.status}")
+                    res2 = submit_answer(day, 2, str(part2), config)
+                    print(f"[agent] Submit Part 2 status: {res2.status}")
+                except RateLimitError as exc:
+                    parser.error(str(exc))
+                    return 2
+                except SubmitError as exc:
+                    parser.error(str(exc))
+                    return 2
+
             return 0
         case _:
             parser.error("Unknown command")

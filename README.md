@@ -47,6 +47,14 @@ python -m agent submit --day 2 --part 1 --confirm
 ```
 Alternatively, put your session cookie in a file named `.aoc_session` at the repo root (one line with the cookie value); it is git-ignored.
 
+### Agent shortcuts
+- Scaffold a new day: `python -m agent scaffold --day 4` (creates solution/test stubs).
+- Fetch, solve both parts, save outputs, optionally validate and submit:
+  ```
+  python -m agent run --day 2 --validate-tests
+  python -m agent run --day 2 --submit --confirm   # also submits both parts (rate-limited)
+  ```
+
 ## Tests
 ```
 pytest
