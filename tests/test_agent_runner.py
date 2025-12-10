@@ -1,8 +1,7 @@
 import pytest
 
 from agent.config import ConfigError
-from agent.runner import run_solver, write_outputs
-from pathlib import Path
+from agent.runner import run_solver
 
 
 def test_run_solver_part1_day1():
@@ -21,9 +20,3 @@ def test_run_solver_part2_day1():
 def test_missing_solver():
     with pytest.raises(ConfigError):
         run_solver(30, 1)
-
-
-def test_write_outputs(tmp_path: Path):
-    p1, p2 = write_outputs(5, 123, 456, base_dir=tmp_path)
-    assert p1.read_text() == "123"
-    assert p2.read_text() == "456"

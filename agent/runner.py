@@ -43,14 +43,3 @@ def run_solver(day: int, part: int, *, input_path: Path | None = None, input_tex
 
     part2_result = solve_part2(input_text)
     return part1_result, part2_result
-
-
-def write_outputs(day: int, part1: int, part2: int, *, base_dir: Path | None = None) -> tuple[Path, Path]:
-    base = base_dir or Path(__file__).resolve().parent.parent
-    out_dir = base / "outputs"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    p1_path = out_dir / f"day_{day:02d}_part1.txt"
-    p2_path = out_dir / f"day_{day:02d}_part2.txt"
-    p1_path.write_text(str(part1))
-    p2_path.write_text(str(part2))
-    return p1_path, p2_path
