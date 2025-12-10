@@ -10,6 +10,7 @@ import sys
 from agent.config import ConfigError, load_config, validate_day, validate_part
 from agent.errors import FetchError, LockedDayError
 from agent.fetch import fetch_input, fetch_puzzle
+from agent.scaffold import scaffold_day
 from agent.runner import run_solver
 from agent.submit import RateLimitError, SubmitError, submit_answer
 
@@ -40,6 +41,10 @@ def build_parser() -> argparse.ArgumentParser:
     submit_parser.add_argument("--answer", type=str, default=None, help="Answer to submit (default: compute via solver)")
     submit_parser.add_argument("--confirm", action="store_true", help="Required flag to actually submit")
     submit_parser.add_argument("--input", type=str, default=None, help="Path to input file (defaults to inputs/day_XX.txt)")
+
+    # scaffold
+    scaffold_parser = subparsers.add_parser("scaffold", help="Create solution/test stubs for a day")
+    scaffold_parser.add_argument("--day", type=int, required=True, help="Day number (1-25)")
 
     return parser
 
@@ -120,6 +125,11 @@ def main(argv: list[str] | None = None) -> int:
 
             print(f"[agent] Submit status: {submit_res.status}")
             print(f"[agent] Response saved to: {submit_res.path}")
+            return 0
+        case "scaffold":
+            sol_path, test_path = scaffold_day(day)
+            print(f"[agent] Scaffolded solution: {sol_path}")
+            print(f"[agent] Scaffolded test: {test_path}")
             return 0
         case _:
             parser.error("Unknown command")

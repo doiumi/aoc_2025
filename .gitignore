@@ -203,6 +203,9 @@ cython_debug/
 
 # AoC session cookie file (not to be committed)
 .aoc_session
+
+# Solver outputs
+outputs/
 # Marimo
 marimo/_static/
 marimo/_lsp/
